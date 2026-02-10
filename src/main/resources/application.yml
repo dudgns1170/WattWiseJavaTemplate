@@ -20,7 +20,6 @@ spring:
     url: ${DB_URL:jdbc:mysql://192.168.20.169:13306/so_user_inquiry?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Seoul&characterEncoding=UTF-8}
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: ${DB_USERNAME:root}
-    password: ${DB_PASSWORD:Solarteq1919!} # 특수문자 대비 따옴표 권장
     hikari:
       maximum-pool-size: 10
       minimum-idle: 2
