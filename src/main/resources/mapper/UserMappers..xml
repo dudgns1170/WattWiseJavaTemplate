@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.app.repository.UserMapper">
+
+	<!--공용 컬럼 묶음 -->
+	<sql id="userColumns">
+		user_no AS userNo,
+		user_id AS userId,
+		user_email AS userEmail,
+		user_pw AS userPw,
+		user_name AS userName,
+		user_phone AS userPhone,
+		user_type AS userType,
+		user_address AS userAddress,
+		created_at AS createdAt,
+		updated_at AS updatedAt
+	</sql>
+	<select id="countById" resultType="int">
+		SELECT COUNT(*) FROM user_info WHERE user_id = #{userId}
+	</select>
+
+	<select id="countByEmail" resultType="int">
+		SELECT COUNT(*) FROM user_info WHERE user_email = #{userEmail}
+	</select>
+
+	<insert id="insertUser" parameterType="com.app.entity.UserEntity">
+		INSERT INTO user_info (
+		user_no,
+		user_id,
+		user_email,
+		user_pw,
+		user_name,
+		user_phone,
+		user_type,
+		user_address,
+		created_at,
+		updated_at
+		)
+		SELECT
+		CONCAT('U', LPAD(COALESCE(MAX(CAST(SUBSTRING(user_no, 2) AS UNSIGNED)), 0) + 1, 5, '0')),
+		#{userId},
+		#{userEmail},
+		#{userPw},
+		#{userName},
+		#{userPhone},
+		#{userType},
+		#{userAddress},
+		NOW(),
+		NOW()
+		FROM user_info;
+	</insert>
+
+	<select id="findById" resultType="com.app.entity.UserEntity"> SELECT <include
+			refid="userColumns" /> FROM user_info WHERE user_id = #{userId} </select>
+
+	<!-- (예시) 부분 업데이트 -->
+	<update id="updateUser" parameterType="com.app.entity.UserEntity"> UPDATE
+		user_info <set>
+			<if test="userEmail != null"> user_email = #{userEmail}, </if>
+      <if
+				test="userName  != null"> user_name = #{userName}, </if>
+      <if
+				test="userPhone != null"> user_phone = #{userPhone}, </if>
+      <if
+				test="userType  != null"> user_type = #{userType}, </if>
+      <if
+				test="userAddress != null"> user_address = #{userAddress}, </if>
+		updated_at = NOW() </set> WHERE user_id = #{userId} </update>
+
+	<delete id="deleteById" parameterType="string">
+		DELETE FROM user_info WHERE user_id = #{userId}
+	</delete>
+
+	<select id="findAll" resultType="com.app.entity.UserEntity"> SELECT <include
+			refid="userColumns" /> FROM user_info </select>
+
+	<update id="updateUserDynamic" parameterType="com.app.entity.UserEntity">
+		UPDATE user_info <set>
+			<if test="userEmail != null"> user_email = #{userEmail}, </if>
+      <if
+				test="userName  != null"> user_name = #{userName}, </if>
+      <if
+				test="userPhone != null"> user_phone = #{userPhone}, </if>
+      <if
+				test="userType  != null"> user_type = #{userType}, </if>
+      <if
+				test="userAddress != null"> user_address = #{userAddress}, </if>
+		updated_at = NOW() </set> WHERE user_id = #{userId} </update>
+
+	<select id="searchuser_info" resultType="com.app.entity.UserEntity"> SELECT <include
+			refid="userColumns" /> FROM user_info <where>
+			<if test="userId != null and userId != ''">
+				user_id = #{userId}
+			</if>
+			<if test="userName != null and userName != ''">
+				AND user_name LIKE CONCAT('%', #{userName}, '%')
+			</if>
+			<if test="userPh != null and userPh != ''">
+				AND user_phone = #{userPh}
+			</if>
+		</where>
+	</select>
+
+	<select id="findByIds" resultType="com.app.entity.UserEntity"> SELECT <include
+			refid="userColumns" /> FROM user_info WHERE user_id IN <foreach
+			collection="userIds" item="id" open="(" separator="," close=")">
+		#{id}
+		</foreach>
+	</select>
+
+</mapper>

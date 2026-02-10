@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.app.repository.timeseries.SensorDataMapper">
+
+	<insert id="insert" parameterType="com.app.entity.timeseries.SensorDataEntity">
+		INSERT INTO sensor_data (
+		time,
+		sensor_id,
+		temperature,
+		cpu
+		) VALUES (
+		#{time},
+		#{sensorId},
+		#{temperature},
+		#{cpu}
+		)
+	</insert>
+
+	<select id="findBySensorIdAndTimeRange" resultType="com.app.entity.timeseries.SensorDataEntity">
+	  <![CDATA[
+	    SELECT
+	      time,
+	      sensor_id AS sensorId,
+	      temperature,
+	      cpu
+	    FROM sensor_data
+	    WHERE sensor_id = #{sensorId}
+	      AND time >= #{start}
+	      AND time < #{end}
+	    ORDER BY time
+	  ]]>
+	</select>
+
+
+	<select id="findDailyAvgTemperatureBySensorIdAndTimeRange" resultType="com.app.dto.DailyTemperatureAvgDto">
+		SELECT
+		date_trunc('day', time) AS dayStart,
+		count(*) AS count,
+		avg(temperature) AS avgTemperature
+		FROM sensor_data
+		WHERE sensor_id = #{sensorId}
+		AND time &gt;= #{start}
+		AND time &lt; #{end}
+		GROUP BY date_trunc('day', time)
+		ORDER BY dayStart
+	</select>
+
+</mapper>

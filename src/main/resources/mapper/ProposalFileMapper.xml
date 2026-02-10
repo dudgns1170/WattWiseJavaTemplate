@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.app.repository.ProposalFileMapper">
+
+	<resultMap id="ProposalFileResult" type="com.app.entity.ProposalFileEntity">
+		<id property="pr_no" column="pr_no" />
+		<result property="pr_user_id" column="pr_user_id" />
+		<result property="pr_co_name" column="pr_co_name" />
+		<result property="pr_site_address" column="pr_site_address" />
+		<result property="pr_capacity" column="pr_capacity" />
+		<result property="pr_file_name" column="pr_file_name" />
+		<result property="pr_file_storage_url" column="pr_file_storage_url" />
+		<result property="pr_file_created_by_name"
+			column="pr_file_created_by_name" />
+		<result property="pr_file_updated_by_name"
+			column="pr_file_updated_by_name" />
+		<result property="created_at" column="created_at" />
+		<result property="updated_at" column="updated_at" />
+	</resultMap>
+
+	<insert id="insertFile" parameterType="com.app.entity.ProposalFileEntity">
+		INSERT INTO proposal_info (
+		pr_no,
+		pr_user_id,
+		pr_co_name,
+		pr_site_address,
+		pr_capacity,
+		pr_file_name,
+		pr_file_storage_url,
+		pr_file_created_by_name,
+		pr_file_updated_by_name,
+		created_at,
+		updated_at
+		)
+		SELECT
+		CONCAT('F', LPAD(COALESCE(MAX(CAST(SUBSTRING(pr_no, 2) AS UNSIGNED)), 0)
+		+ 1, 5, '0')),
+		#{pr_user_id},
+		#{pr_co_name},
+		#{pr_site_address},
+		#{pr_capacity},
+		#{pr_file_name},
+		#{pr_file_storage_url},
+		#{pr_file_created_by_name},
+		#{pr_file_updated_by_name},
+		NOW(),
+		NOW()
+		FROM proposal_info;
+	</insert>
+
+	<update id="updateFile" parameterType="com.app.entity.ProposalFileEntity">
+		UPDATE proposal_file <set>
+			<if test="pr_file_name != null">pr_file_name = #{pr_file_name},</if>
+      <if
+				test="pr_file_object_key != null">pr_file_object_key =
+		#{pr_file_object_key},</if>
+      <if test="pr_file_storage_url != null">pr_file_storage_url
+		= #{pr_file_storage_url},</if>
+      <if test="pr_file_updated_by_name != null">pr_file_updated_by_name
+		= #{pr_file_updated_by_name},</if> updated_at = #{updated_at} </set>
+		WHERE pr_no = #{pr_no} AND pr_file_object_key = #{pr_file_object_key} </update>
+
+	<select id="findByProposalNo" resultMap="ProposalFileResult">
+		SELECT * FROM proposal_file
+		WHERE pr_no = #{proposalNo}
+		ORDER BY created_at DESC
+	</select>
+
+	<select id="findByIdAndProposalNo" resultMap="ProposalFileResult">
+		SELECT * FROM proposal_file
+		WHERE pr_no = #{proposalNo}
+		AND pr_file_id = #{fileId}
+	</select>
+
+	<select id="findById" resultMap="ProposalFileResult">
+		SELECT * FROM proposal_file
+		WHERE pr_file_id = #{fileId}
+	</select>
+
+	<delete id="delete">
+		DELETE FROM proposal_file WHERE pr_file_id = #{fileId}
+	</delete>
+
+</mapper>

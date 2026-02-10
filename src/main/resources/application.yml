@@ -1,0 +1,113 @@
+server:
+  port: 8080
+  servlet:
+    session:
+      tracking-modes: cookie
+      cookie:
+        secure: false # 로컬(HTTP) 개발이면 false, 운영(HTTPS)면 true
+
+spring:
+  application:
+    name: wattwise
+
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 50MB
+
+  # ===================== DB: MySQL =====================
+  datasource:
+    url: ${DB_URL:jdbc:mysql://192.168.20.169:13306/so_user_inquiry?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Seoul&characterEncoding=UTF-8}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:Solarteq1919!} # 특수문자 대비 따옴표 권장
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 2
+      connection-timeout: 20000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+    # ===================== DB: TimescaleDB (PostgreSQL) =====================
+    timescale:
+      url: ${TS_DB_URL:jdbc:postgresql://localhost:5432/testDb}
+      driver-class-name: org.postgresql.Driver
+      username: ${TS_DB_USERNAME:timescale_user}
+      password: ${TS_DB_PASSWORD:password}
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+
+  sql:
+    init:
+      mode: never # H2 초기화 비활성화
+
+  # ===================== Mail (Gmail SMTP) ==================
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          ssl.trust: smtp.gmail.com
+          auth: true
+          starttls:
+            enable: true
+            required: true
+          connectiontimeout: 5000
+          timeout: 5000
+          writetimeout: 5000
+    default-encoding: UTF-8
+
+  # ===================== Redis ==============================
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      # password: ${REDIS_PASSWORD:}
+
+# --- MyBatis ---
+mybatis:
+  mapper-locations: classpath:mapper/*.xml
+  type-aliases-package: com.app.entity
+  configuration:
+    map-underscore-to-camel-case: true
+
+# --- CORS & JWT & APP CONFIG ---
+app:
+  cors:
+    allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:3000,http://localhost:5173}
+  jwt:
+    issuer: "com.app"
+    access-ttl-minutes: 5
+    refresh-ttl-days: 1
+    secret: "${JWT_SECRET}"
+  mail:
+    from: "your.gmail.account@gmail.com" # 발신 기본주소(선택)
+    auth-code-expiration-millis: 300000 # 5분
+  aws:
+    s3:
+      bucket: ${AWS_S3_BUCKET}
+      region: ${AWS_REGION}
+      access-key: ${AWS_ACCESS_KEY_ID}
+      secret-key: ${AWS_SECRET_ACCESS_KEY}
+      base-url: ${AWS_S3_BASE_URL}
+
+logging:
+  level:
+    root: INFO
+    com.app: DEBUG
+
+# --- SpringDoc OpenAPI ---
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operations-sorter: method
+  show-actuator: false

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.app.repository.timeseries.SensorMapper">
+
+    <select id="findAll" resultType="com.app.entity.timeseries.SensorEntity">
+        SELECT
+            id,
+            type,
+            location
+        FROM sensors
+        ORDER BY id
+    </select>
+
+    <select id="findById" resultType="com.app.entity.timeseries.SensorEntity">
+        SELECT
+            id,
+            type,
+            location
+        FROM sensors
+        WHERE id = #{id}
+    </select>
+
+    <insert id="insertIfNotExists">
+        INSERT INTO sensors (id, type, location)
+        VALUES (#{id}, #{type}, #{location})
+        ON CONFLICT (id) DO NOTHING
+    </insert>
+
+</mapper>
